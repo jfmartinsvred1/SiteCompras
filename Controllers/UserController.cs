@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SiteCompras.Dtos;
 using SiteCompras.Interfaces;
 
 namespace SiteCompras.Controllers
 {
+    [ApiController]
     [Route("[Controller]")]
     public class UserController:ControllerBase
     {
@@ -15,24 +17,25 @@ namespace SiteCompras.Controllers
         }
 
         //Create
-        [HttpPost("/create/admin")]
+        [HttpPost("create/admin")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> CreateAdmin([FromBody] CreateUserDto userDto)
         {
             await _userDao.Create(userDto,"Admin");
             return Ok("Criado Com Sucesso");
         }
-        [HttpPost("/create/cliente")]
+        [HttpPost("create/cliente")]
         public async Task<IActionResult> CreateCliente([FromBody] CreateUserDto userDto)
         {
             await _userDao.Create(userDto, "Cliente");
             return Ok("Criado Com Sucesso");
         }
 
-        [HttpPost("/create/role")]
-        public async Task<IActionResult> CreateRole([FromBody] string role)
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginUser([FromBody] LoginUserDto dto)
         {
-            await _userDao.CreateRole(role);
-            return Ok("Criada com sucesso");
+            var token = await _userDao.Login(dto);
+            return Ok(token);
         }
     }
 }
