@@ -51,7 +51,8 @@ namespace SiteCompras.Data.Dao
             }
             var user = _mapper.Map<User>(userDto);
             var roles = await ReturnRolesUser(user);
-            var roles2 = await _userManager.GetRolesAsync(user);
+            //var roles2 = await _userManager.GetRolesAsync(user);
+            //Esse metodo nao ta funcionando
             var token = _tokenService.GenerateToken(user, roles);
             return token;
         }

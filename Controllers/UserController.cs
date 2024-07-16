@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SiteCompras.Dtos;
 using SiteCompras.Interfaces;
 
@@ -17,6 +18,7 @@ namespace SiteCompras.Controllers
 
         //Create
         [HttpPost("create/admin")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> CreateAdmin([FromBody] CreateUserDto userDto)
         {
             await _userDao.Create(userDto,"Admin");

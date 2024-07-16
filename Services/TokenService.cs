@@ -12,7 +12,7 @@ namespace SiteCompras.Services
         public  string GenerateToken(User user, List<string> roles)
         {
             var tokenHander = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("sdfdsfsd87fsd7fsd6fdf87sbhdfbhdf4hk");
+            var key = Encoding.ASCII.GetBytes("sdfdsfsd87fsd7fsd6fdfsdfdsfsdf34");
             var claims = new List<Claim>();
             foreach (var role in roles)
             {
