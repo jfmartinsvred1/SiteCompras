@@ -9,6 +9,7 @@ namespace SiteCompras.Profiles
         public UserProfile()
         {
             CreateMap<CreateUserDto, User>();
+            CreateMap<LoginUserDto, User>();
         }
     }
 }

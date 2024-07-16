@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using SiteCompras.Dtos;
 using SiteCompras.Interfaces;
 using SiteCompras.Models;
+using SiteCompras.Services;
 
 namespace SiteCompras.Data.Dao
 {
@@ -11,12 +11,17 @@ namespace SiteCompras.Data.Dao
     {
         private IMapper _mapper;
         private UserManager<User> _userManager;
+        private SignInManager<User> _signInManager;
+        private TokenService _tokenService;
         private RoleManager<IdentityRole> _roleManager;
 
-        public UserDao(IMapper mapper, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+
+        public UserDao(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager, TokenService tokenService, RoleManager<IdentityRole> roleManager)
         {
             _mapper = mapper;
             _userManager = userManager;
+            _signInManager = signInManager;
+            _tokenService = tokenService;
             _roleManager = roleManager;
         }
 
@@ -24,22 +29,63 @@ namespace SiteCompras.Data.Dao
         {
             var user = _mapper.Map<User>(userDto);
             IdentityResult result = await _userManager.CreateAsync(user, userDto.Password);
-            await _userManager.AddToRoleAsync(user, role);
+            if (!await _roleManager.RoleExistsAsync(role)) 
+            {
+                await CreateRoleAsync(role);
+            }
+            await AddInToRole(user, role);
             if (!result.Succeeded)
             {
                 throw new Exception("Error Create");
             }
         }
 
-        public async Task CreateRole(string name)
+
+        public async Task<string> Login(LoginUserDto userDto)
         {
-            var result = await _roleManager.CreateAsync(new IdentityRole(name));
+            var resultado = await _signInManager.PasswordSignInAsync(userDto.Username, userDto.Password, false, false);
 
-            if(!result.Succeeded) 
+            if (!resultado.Succeeded)
             {
-                throw new Exception("Error Create");
+                throw new ApplicationException("Usuario nao autenticado");
             }
+            var user = _mapper.Map<User>(userDto);
+            var roles = await ReturnRolesUser(user);
+            var roles2 = await _userManager.GetRolesAsync(user);
+            var token = _tokenService.GenerateToken(user, roles);
+            return token;
+        }
+        public async Task CreateRoleAsync(string roleName)
+        {
+            await _roleManager.CreateAsync(new IdentityRole(roleName));
+        }
 
+        public async Task AddInToRole(User user, string roleName)
+        {
+            await _userManager.AddToRoleAsync(user, roleName);
+        }
+
+        public async Task<List<string>> ReturnRolesUser(User user)
+        {
+            var usersAdmin = await _userManager.GetUsersInRoleAsync("Admin");
+            var usersCliente = await _userManager.GetUsersInRoleAsync("Cliente");
+
+            var list = new List<string>();
+            foreach (var userAdmin in usersAdmin)
+            {
+                if (userAdmin.UserName == user.UserName)
+                {
+                    list.Add("Admin");
+                }
+            }
+            foreach(var userCliente in usersCliente)
+            {
+                if (userCliente == user)
+                {
+                    list.Add("Cliente");
+                }
+            }
+            return list;
         }
     }
 }

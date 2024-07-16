@@ -1,9 +1,13 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SiteCompras.Data;
 using SiteCompras.Data.Dao;
 using SiteCompras.Interfaces;
 using SiteCompras.Models;
+using SiteCompras.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,7 @@ var connectionString = builder.Configuration.GetConnectionString("DbConnection")
 
 // Add services to the container.
 builder.Services.AddScoped<IUserDao, UserDao>();
+builder.Services.AddTransient<TokenService>();
 
 builder.Services.AddDbContext<AppDbContext>(opts =>
 {
@@ -18,7 +23,26 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
 });
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.AddControllers();
+
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x => 
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("sdfdsfsd87fsd7fsd6fdf87sbhdfbhdf4hk")),
+        ValidateIssuerSigningKey = true,
+        ValidateAudience = false
+    };
+});
+
 
 builder.Services.AddIdentity<User,IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
@@ -39,6 +63,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
