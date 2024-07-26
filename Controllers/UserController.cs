@@ -17,11 +17,11 @@ namespace SiteCompras.Controllers
         }
 
         //Create
-        [HttpPost("create/admin")]
+        [HttpPost("create/manager")]
         [Authorize(Roles ="Admin")]
-        public async Task<IActionResult> CreateAdmin([FromBody] CreateUserDto userDto)
+        public async Task<IActionResult> CreateManager([FromBody] CreateUserDto userDto)
         {
-            await _userDao.Create(userDto,"Admin");
+            await _userDao.Create(userDto,"Manager");
             return Ok("Criado Com Sucesso");
         }
         [HttpPost("create/cliente")]

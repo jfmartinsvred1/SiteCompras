@@ -6,5 +6,6 @@ namespace SiteCompras.Data
 {
     public class AppDbContext(DbContextOptions opts):IdentityDbContext<User>(opts)
     {
+        public DbSet<Product> Products { get; set; }
     }
 }
