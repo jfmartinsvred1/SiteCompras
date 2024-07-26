@@ -69,7 +69,8 @@ namespace SiteCompras.Data.Dao
         public async Task<List<string>> ReturnRolesUser(User user)
         {
             var usersAdmin = await _userManager.GetUsersInRoleAsync("Admin");
-            var usersCliente = await _userManager.GetUsersInRoleAsync("Cliente");
+            var usersCliente = await _userManager.GetUsersInRoleAsync("Client");
+            var usersManager = await _userManager.GetUsersInRoleAsync("Manager");
 
             var list = new List<string>();
             foreach (var userAdmin in usersAdmin)
@@ -79,11 +80,18 @@ namespace SiteCompras.Data.Dao
                     list.Add("Admin");
                 }
             }
-            foreach(var userCliente in usersCliente)
+            foreach (var userManager in usersManager)
+            {
+                if (userManager.UserName == user.UserName)
+                {
+                    list.Add("Manager");
+                }
+            }
+            foreach (var userCliente in usersCliente)
             {
                 if (userCliente == user)
                 {
-                    list.Add("Cliente");
+                    list.Add("Client");
                 }
             }
             return list;

@@ -58,6 +58,7 @@ builder.Services.AddTransient<TokenService>();
 
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -70,5 +71,35 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    string username = "admin";
+    string password = "Teste1234,";
+    var roles = new[] { "Admin", "Manager", "Client" };
+
+    foreach (var role in roles)
+    {
+        if(!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    if (await userManager.FindByNameAsync(username) == null)
+    {
+        var user = new User();
+        user.UserName = username;
+        user.Email = "admin@admin.com";
+
+        await userManager.CreateAsync(user, password);
+
+        await userManager.AddToRoleAsync(user, "Admin");
+        await userManager.AddToRoleAsync(user, "Manager");
+    }
+}
 
 app.Run();
