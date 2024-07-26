@@ -27,6 +27,7 @@ builder.Services.AddIdentity<User, IdentityRole>()
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IUserDao, UserDao>();
+builder.Services.AddScoped<IProductDao, ProductDao>();
 
 builder.Services.AddControllers();
 
