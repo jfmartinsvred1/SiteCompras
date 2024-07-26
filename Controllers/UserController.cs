@@ -24,10 +24,10 @@ namespace SiteCompras.Controllers
             await _userDao.Create(userDto,"Manager");
             return Ok("Criado Com Sucesso");
         }
-        [HttpPost("create/cliente")]
+        [HttpPost("create/client")]
         public async Task<IActionResult> CreateCliente([FromBody] CreateUserDto userDto)
         {
-            await _userDao.Create(userDto, "Cliente");
+            await _userDao.Create(userDto, "Client");
             return Ok("Criado Com Sucesso");
         }
 

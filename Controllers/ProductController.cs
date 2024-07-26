@@ -25,7 +25,6 @@ namespace SiteCompras.Controllers
         }
         [HttpPost("create")]
         [Authorize(Roles ="Admin")]
-        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Create(CreateProductDto productDto)
         {
             await _productDao.Create(productDto);
