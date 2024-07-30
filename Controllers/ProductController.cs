@@ -23,7 +23,7 @@ namespace SiteCompras.Controllers
         {
             return await _productDao.GetAll();
         }
-        [HttpPost("create")]
+        [HttpPost("Stock/createProduct")]
         [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Create(CreateProductDto productDto)
         {
@@ -32,7 +32,7 @@ namespace SiteCompras.Controllers
             return Ok("Produto Inserido Com Sucesso");
 
         }
-        [HttpPost("updateAmount/{amount}/{productId}")]
+        [HttpPost("Stock/UpdateAmount/{amount}/{productId}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateAmount(int amount,int productId)
         {
@@ -40,6 +40,13 @@ namespace SiteCompras.Controllers
 
             return Ok("Quantidade Alterada Com Sucesso");
 
+        }
+
+        [HttpPost("Cart/addToCart")]
+        public async Task<IActionResult> AddProductInCart(CreateProductSelectedDto dto)
+        {
+            await _productDao.AddProductInCart(dto);
+            return Ok("Adicionado Com sucesso");
         }
 
     }

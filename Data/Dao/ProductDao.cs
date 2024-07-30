@@ -33,6 +33,14 @@ namespace SiteCompras.Data.Dao
             await _appDbContext.SaveChangesAsync();
         }
 
+        public async Task AddProductInCart(CreateProductSelectedDto dto)
+        {
+            var product = _mapper.Map<ProductSelected>(dto);
+
+            await _appDbContext.ProductSelecteds.AddAsync(product);
+            await _appDbContext.SaveChangesAsync();
+        }
+
         public async Task Create(CreateProductDto productDto)
         {
             var product = _mapper.Map<Product>(productDto);

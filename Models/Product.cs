@@ -9,6 +9,7 @@ namespace SiteCompras.Models
         public string Name { get; set; }
         public double Price { get; set; }
         public int Amount { get; set; } = 0;
+        public List<ProductSelected> ProductSelecteds { get; set; }
 
     }
 }

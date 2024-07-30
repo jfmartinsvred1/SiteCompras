@@ -14,16 +14,19 @@ namespace SiteCompras.Data.Dao
         private SignInManager<User> _signInManager;
         private TokenService _tokenService;
         private RoleManager<IdentityRole> _roleManager;
+        private AppDbContext _appDbContext;
 
 
-        public UserDao(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager, TokenService tokenService, RoleManager<IdentityRole> roleManager)
+        public UserDao(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager, TokenService tokenService, RoleManager<IdentityRole> roleManager, AppDbContext appDbContext)
         {
             _mapper = mapper;
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
             _roleManager = roleManager;
+            _appDbContext = appDbContext;
         }
+
 
         public async Task Create(CreateUserDto userDto, string role)
         {
@@ -34,6 +37,14 @@ namespace SiteCompras.Data.Dao
                 await CreateRoleAsync(role);
             }
             await AddInToRole(user, role);
+            if (role == "Client")
+            {
+                var cart = new Cart();
+                cart.UserId = user.Id;
+
+                _appDbContext.Carts.Add(cart);
+                _appDbContext.SaveChanges();
+            }
             if (!result.Succeeded)
             {
                 throw new Exception("Error Create");
@@ -51,8 +62,6 @@ namespace SiteCompras.Data.Dao
             }
             var user = _mapper.Map<User>(userDto);
             var roles = await ReturnRolesUser(user);
-            //var roles2 = await _userManager.GetRolesAsync(user);
-            //Esse metodo nao ta funcionando
             var token = _tokenService.GenerateToken(user, roles);
             return token;
         }
